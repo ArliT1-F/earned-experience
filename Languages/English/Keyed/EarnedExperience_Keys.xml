@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <!-- Global settings -->
+  <EarnedExperience_Settings_Global>General</EarnedExperience_Settings_Global>
+  <EarnedExperience_MasterEnabled_Label>Enable Earned Experience</EarnedExperience_MasterEnabled_Label>
+  <EarnedExperience_MasterEnabled_Desc>Master toggle for the entire XP system. Disable to restore pure vanilla behaviour without uninstalling.</EarnedExperience_MasterEnabled_Desc>
+  <EarnedExperience_GlobalMult_Label>Global XP multiplier:</EarnedExperience_GlobalMult_Label>
+  <EarnedExperience_GlobalMult_Desc>Multiplies XP for every supported activity. 1.0 = designed balance, 0 = no XP, 2.0 = twice as fast. Adjust if you find progression too slow or too fast overall.</EarnedExperience_GlobalMult_Desc>
+  <EarnedExperience_Notifications_Label>Show floating XP text</EarnedExperience_Notifications_Label>
+  <EarnedExperience_Notifications_Desc>Display a subtle floating text near the pawn when they earn XP from a modded activity. Throttled to avoid spam.</EarnedExperience_Notifications_Desc>
+  <EarnedExperience_DebugLog_Label>Enable debug logging</EarnedExperience_DebugLog_Label>
+  <EarnedExperience_DebugLog_Desc>Write detailed XP award info to the RimWorld log (developer mode). Useful for verifying balance or diagnosing issues.</EarnedExperience_DebugLog_Desc>
+  <EarnedExperience_RestoreDefaults_Label>Restore defaults</EarnedExperience_RestoreDefaults_Label>
+  <EarnedExperience_Activities_Header>Activities</EarnedExperience_Activities_Header>
+  <EarnedExperience_Footer_Hint>Tip: Multiplier 0 disables XP for that activity. Skill assignment controls which skill receives the XP. Changes apply immediately and respect passion/learning limits.</EarnedExperience_Footer_Hint>
+
+  <EarnedExperience_Col_Activity>Activity</EarnedExperience_Col_Activity>
+  <EarnedExperience_Col_Enabled>Enabled</EarnedExperience_Col_Enabled>
+  <EarnedExperience_Col_Multiplier>Multiplier</EarnedExperience_Col_Multiplier>
+  <EarnedExperience_Col_Skill>Skill</EarnedExperience_Col_Skill>
+
+  <!-- Activity labels -->
+  <EarnedExperience_Stonecutting_Label>Stonecutting</EarnedExperience_Stonecutting_Label>
+  <EarnedExperience_Stonecutting_Desc>Cutting stone chunks into blocks at the stonecutting table. Vanilla awards no Crafting XP. This mod awards Crafting XP proportional to work ticks.</EarnedExperience_Stonecutting_Desc>
+  <EarnedExperience_Smelting_Label>Smelting</EarnedExperience_Smelting_Label>
+  <EarnedExperience_Smelting_Desc>Smelting weapons, apparel and other items at fueled/electric smelters. Vanilla awards no XP. Awards Crafting XP proportional to work ticks.</EarnedExperience_Smelting_Desc>
+  <EarnedExperience_Cleaning_Label>Cleaning</EarnedExperience_Cleaning_Label>
+  <EarnedExperience_Cleaning_Desc>Cleaning dirt, blood and filth. No ideal vanilla skill exists; default is Crafting at 0.5x so dedicated cleaners still develop slowly. Reassign to any skill or disable.</EarnedExperience_Cleaning_Desc>
+  <EarnedExperience_Hauling_Label>Hauling</EarnedExperience_Hauling_Label>
+  <EarnedExperience_Hauling_Desc>Moving resources, items and corpses between stockpiles. No ideal vanilla skill; default is Crafting at 0.5x. XP is awarded on successful haul completion based on distance and mass, clamped to prevent farming.</EarnedExperience_Hauling_Desc>
+  <EarnedExperience_TransportLoading_Label>Transport loading</EarnedExperience_TransportLoading_Label>
+  <EarnedExperience_TransportLoading_Desc>Loading transport pods, caravans and shuttles. Awarded once per item loaded, with duplicate protection for multi-item jobs.</EarnedExperience_TransportLoading_Desc>
+  <EarnedExperience_Refueling_Label>Refueling</EarnedExperience_Refueling_Label>
+  <EarnedExperience_Refueling_Desc>Refueling generators, heaters, stoves and other buildings. Vanilla awards no XP. Awards Construction (configurable) proportional to work ticks.</EarnedExperience_Refueling_Desc>
+  <EarnedExperience_TrapRearming_Label>Trap rearming</EarnedExperience_TrapRearming_Label>
+  <EarnedExperience_TrapRearming_Desc>Rearming traps after activation. Vanilla awards no XP; trap construction does, but rearming is separate. Awards Crafting XP proportional to work.</EarnedExperience_TrapRearming_Desc>
+  <EarnedExperience_Cremation_Label>Cremation</EarnedExperience_Cremation_Label>
+  <EarnedExperience_Cremation_Desc>Burning corpses/apparel at the crematorium (Do_Bill job). Vanilla awards no XP. Awards Crafting XP proportional to work ticks.</EarnedExperience_Cremation_Desc>
+  <EarnedExperience_Firefighting_Label>Firefighting</EarnedExperience_Firefighting_Label>
+  <EarnedExperience_Firefighting_Desc>Extinguishing fires (Beat Fire job). Vanilla awards no XP. Awards Construction XP proportional to work ticks.</EarnedExperience_Firefighting_Desc>
+  <EarnedExperience_PatientCare_Label>Patient care</EarnedExperience_PatientCare_Label>
+  <EarnedExperience_PatientCare_Desc>Feeding incapacitated pawns and similar medical assistance. Only awarded if vanilla does not already award Medical XP for the specific action (vanilla tending/surgery already give Medical XP and are not duplicated).</EarnedExperience_PatientCare_Desc>
+</LanguageData>
