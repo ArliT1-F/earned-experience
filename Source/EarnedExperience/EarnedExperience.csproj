@@ -10,37 +10,55 @@
     <Description>Awards skill XP for meaningful work that vanilla overlooks.</Description>
     <Nullable>disable</Nullable>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <!-- Output to mod Assemblies folder for in-place testing -->
     <OutputPath>../../Assemblies/</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
 
-  <!-- Auto-detect RimWorld install if RIMWORLD_DIR not set.
-       Hardcoded candidates cover default Steam locations on Linux + Windows
-       (plus SteamLibrary on D:/). RIMWORLD_DIR env var still wins if set. -->
+  <!-- Auto-detect RimWorld install if RIMWORLD_DIR not set. -->
   <PropertyGroup>
-    <!-- Linux / Steam Deck / generic Linux Steam -->
     <RimWorldDir Condition="'$(RIMWORLD_DIR)' != ''">$(RIMWORLD_DIR)</RimWorldDir>
     <RimWorldDir Condition="'$(RimWorldDir)' == '' and Exists('$(HOME)/.steam/steam/steamapps/common/RimWorld/RimWorldLinux_Data/Managed/Assembly-CSharp.dll')">$(HOME)/.steam/steam/steamapps/common/RimWorld/RimWorldLinux_Data/Managed</RimWorldDir>
     <RimWorldDir Condition="'$(RimWorldDir)' == '' and Exists('$(HOME)/.local/share/Steam/steamapps/common/RimWorld/RimWorldLinux_Data/Managed/Assembly-CSharp.dll')">$(HOME)/.local/share/Steam/steamapps/common/RimWorld/RimWorldLinux_Data/Managed</RimWorldDir>
     <RimWorldDir Condition="'$(RimWorldDir)' == '' and Exists('$(HOME)/snap/steam/common/.steam/steam/steamapps/common/RimWorld/RimWorldLinux_Data/Managed/Assembly-CSharp.dll')">$(HOME)/snap/steam/common/.steam/steam/steamapps/common/RimWorld/RimWorldLinux_Data/Managed</RimWorldDir>
-    <!-- Windows – via MSBuild well-known properties + hardcoded drive letters (dotnet on Windows normalizes / and \) -->
     <RimWorldDir Condition="'$(RimWorldDir)' == '' and Exists('$(ProgramFilesX86)/Steam/steamapps/common/RimWorld/RimWorldWin64_Data/Managed/Assembly-CSharp.dll')">$(ProgramFilesX86)/Steam/steamapps/common/RimWorld/RimWorldWin64_Data/Managed</RimWorldDir>
     <RimWorldDir Condition="'$(RimWorldDir)' == '' and Exists('$(ProgramFiles)/Steam/steamapps/common/RimWorld/RimWorldWin64_Data/Managed/Assembly-CSharp.dll')">$(ProgramFiles)/Steam/steamapps/common/RimWorld/RimWorldWin64_Data/Managed</RimWorldDir>
     <RimWorldDir Condition="'$(RimWorldDir)' == '' and Exists('C:/Program Files (x86)/Steam/steamapps/common/RimWorld/RimWorldWin64_Data/Managed/Assembly-CSharp.dll')">C:/Program Files (x86)/Steam/steamapps/common/RimWorld/RimWorldWin64_Data/Managed</RimWorldDir>
     <RimWorldDir Condition="'$(RimWorldDir)' == '' and Exists('C:/Program Files/Steam/steamapps/common/RimWorld/RimWorldWin64_Data/Managed/Assembly-CSharp.dll')">C:/Program Files/Steam/steamapps/common/RimWorld/RimWorldWin64_Data/Managed</RimWorldDir>
     <RimWorldDir Condition="'$(RimWorldDir)' == '' and Exists('D:/SteamLibrary/steamapps/common/RimWorld/RimWorldWin64_Data/Managed/Assembly-CSharp.dll')">D:/SteamLibrary/steamapps/common/RimWorld/RimWorldWin64_Data/Managed</RimWorldDir>
-    <!-- Legacy 32-bit managed folder name still used by some installs -->
     <RimWorldDir Condition="'$(RimWorldDir)' == '' and Exists('C:/Program Files (x86)/Steam/steamapps/common/RimWorld/RimWorldWin_Data/Managed/Assembly-CSharp.dll')">C:/Program Files (x86)/Steam/steamapps/common/RimWorld/RimWorldWin_Data/Managed</RimWorldDir>
-    <!-- Fallback: keep whatever was passed (even if not found) so the error message shows it) -->
     <RimWorldDir Condition="'$(RimWorldDir)' == '' and '$(RIMWORLD_DIR)' != ''">$(RIMWORLD_DIR)</RimWorldDir>
+  </PropertyGroup>
+
+  <!-- Auto-detect Harmony (0Harmony.dll) – not always in Managed. Check common mod/workshop locations. -->
+  <PropertyGroup>
+    <HarmonyDir></HarmonyDir>
+    <HarmonyPath></HarmonyPath>
+    <!-- 1) Inside Managed (some installs bundle it) -->
+    <HarmonyDir Condition="'$(RimWorldDir)' != '' and Exists('$(RimWorldDir)/0Harmony.dll')">$(RimWorldDir)</HarmonyDir>
+    <!-- 2) Local Mods/Harmony -->
+    <HarmonyDir Condition="'$(HarmonyDir)' == '' and Exists('$(HOME)/.steam/steam/steamapps/common/RimWorld/Mods/Harmony/Assemblies/0Harmony.dll')">$(HOME)/.steam/steam/steamapps/common/RimWorld/Mods/Harmony/Assemblies</HarmonyDir>
+    <HarmonyDir Condition="'$(HarmonyDir)' == '' and Exists('$(HOME)/.local/share/Steam/steamapps/common/RimWorld/Mods/Harmony/Assemblies/0Harmony.dll')">$(HOME)/.local/share/Steam/steamapps/common/RimWorld/Mods/Harmony/Assemblies</HarmonyDir>
+    <!-- 3) Workshop – Harmony workshop id 2009463077 (and older 2006605350 used by some) -->
+    <HarmonyDir Condition="'$(HarmonyDir)' == '' and Exists('$(HOME)/.steam/steam/steamapps/workshop/content/294100/2009463077/Assemblies/0Harmony.dll')">$(HOME)/.steam/steam/steamapps/workshop/content/294100/2009463077/Assemblies</HarmonyDir>
+    <HarmonyDir Condition="'$(HarmonyDir)' == '' and Exists('$(HOME)/.steam/steam/steamapps/workshop/content/294100/2006605350/1.5/Assemblies/0Harmony.dll')">$(HOME)/.steam/steam/steamapps/workshop/content/294100/2006605350/1.5/Assemblies</HarmonyDir>
+    <HarmonyDir Condition="'$(HarmonyDir)' == '' and Exists('$(HOME)/.steam/steam/steamapps/workshop/content/294100/2009463077/1.5/Assemblies/0Harmony.dll')">$(HOME)/.steam/steam/steamapps/workshop/content/294100/2009463077/1.5/Assemblies</HarmonyDir>
+    <HarmonyDir Condition="'$(HarmonyDir)' == '' and Exists('C:/Program Files (x86)/Steam/steamapps/workshop/content/294100/2009463077/Assemblies/0Harmony.dll')">C:/Program Files (x86)/Steam/steamapps/workshop/content/294100/2009463077/Assemblies</HarmonyDir>
+    <HarmonyDir Condition="'$(HarmonyDir)' == '' and Exists('C:/Program Files (x86)/Steam/steamapps/common/RimWorld/Mods/Harmony/Assemblies/0Harmony.dll')">C:/Program Files (x86)/Steam/steamapps/common/RimWorld/Mods/Harmony/Assemblies</HarmonyDir>
+    <!-- 4) HARMONY_DIR env override -->
+    <HarmonyDir Condition="'$(HARMONY_DIR)' != ''">$(HARMONY_DIR)</HarmonyDir>
+    <HarmonyPath Condition="'$(HarmonyDir)' != ''">$(HarmonyDir)/0Harmony.dll</HarmonyPath>
+    <!-- Also check HARMONY_DIR as direct file -->
+    <HarmonyPath Condition="'$(HarmonyPath)' == '' and '$(HARMONY_DIR)' != '' and Exists('$(HARMONY_DIR)')">$(HARMONY_DIR)</HarmonyPath>
   </PropertyGroup>
 
   <Target Name="PrintRimWorldDir" BeforeTargets="ResolveAssemblyReferences">
     <Message Importance="high" Text="EarnedExperience: using RimWorld Managed dir: $(RimWorldDir)" Condition="'$(RimWorldDir)' != ''" />
+    <Message Importance="high" Text="EarnedExperience: using Harmony dir: $(HarmonyDir)" Condition="'$(HarmonyDir)' != ''" />
     <Warning Text="EarnedExperience: RimWorld not found. Searched default Steam locations and RIMWORLD_DIR='$(RIMWORLD_DIR)'. Set RIMWORLD_DIR to your RimWorld*_Data/Managed folder and rebuild. Example Linux: ~/.steam/steam/steamapps/common/RimWorld/RimWorldLinux_Data/Managed" Condition="'$(RimWorldDir)' == ''" />
+    <Warning Text="EarnedExperience: Harmony (0Harmony.dll) not found. Searched Managed, Mods/Harmony and workshop 2009463077. Build will proceed without Harmony – mod will load but award no XP until Harmony is installed. Set HARMONY_DIR to the folder/file containing 0Harmony.dll if needed." Condition="'$(HarmonyPath)' == '' or !Exists('$(HarmonyPath)')" />
   </Target>
 
+  <!-- RimWorld core references (required) -->
   <ItemGroup Condition="'$(RimWorldDir)' != ''">
     <Reference Include="Assembly-CSharp">
       <HintPath>$(RimWorldDir)/Assembly-CSharp.dll</HintPath>
@@ -58,11 +76,20 @@
       <HintPath>$(RimWorldDir)/UnityEngine.TextRenderingModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
+  </ItemGroup>
+
+  <!-- Harmony – only if found; otherwise patches compile out via conditional (see below) -->
+  <ItemGroup Condition="Exists('$(HarmonyPath)')">
     <Reference Include="0Harmony">
-      <HintPath>$(RimWorldDir)/0Harmony.dll</HintPath>
+      <HintPath>$(HarmonyPath)</HintPath>
       <Private>false</Private>
     </Reference>
   </ItemGroup>
+
+  <!-- Stub Harmony when real 0Harmony.dll not found – allows build to succeed locally -->
+  <PropertyGroup Condition="!Exists('$(HarmonyPath)')">
+    <DefineConstants>$(DefineConstants);HARMONY_MISSING</DefineConstants>
+  </PropertyGroup>
 
   <!-- No Managed folder found: allow docs/CI to validate files as text without failing -->
   <ItemGroup Condition="'$(RimWorldDir)' == ''">
