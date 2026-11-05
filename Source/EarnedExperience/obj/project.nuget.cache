@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "pIh2R7kJMWs=",
+  "success": true,
+  "projectFilePath": "/home/turka/Desktop/earned-experience/Source/EarnedExperience/EarnedExperience.csproj",
+  "expectedPackageFiles": [
+    "/home/turka/.nuget/packages/microsoft.netframework.referenceassemblies/1.0.3/microsoft.netframework.referenceassemblies.1.0.3.nupkg.sha512",
+    "/home/turka/.nuget/packages/microsoft.netframework.referenceassemblies.net472/1.0.3/microsoft.netframework.referenceassemblies.net472.1.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}

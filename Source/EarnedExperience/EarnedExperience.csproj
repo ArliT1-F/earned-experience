@@ -14,33 +14,54 @@
     <OutputPath>../../Assemblies/</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
-  <ItemGroup>
-    <!-- RimWorld and Unity references – set RIMWORLD_DIR env var or edit HintPath -->
-    <!-- Example Windows: C:\Program Files (x86)\Steam\steamapps\common\RimWorld\RimWorldWin64_Data\Managed -->
-    <!-- Example Linux:   ~/.steam/steam/steamapps/common/RimWorld/RimWorldLinux_Data/Managed -->
+  <!-- Auto-detect RimWorld install if RIMWORLD_DIR not set.
+       Hardcoded candidates cover default Steam locations on Linux + Windows
+       (plus SteamLibrary on D:/). RIMWORLD_DIR env var still wins if set. -->
+  <PropertyGroup>
+    <!-- Linux / Steam Deck / generic Linux Steam -->
+    <RimWorldDir Condition="'$(RIMWORLD_DIR)' != ''">$(RIMWORLD_DIR)</RimWorldDir>
+    <RimWorldDir Condition="'$(RimWorldDir)' == '' and Exists('$(HOME)/.steam/steam/steamapps/common/RimWorld/RimWorldLinux_Data/Managed/Assembly-CSharp.dll')">$(HOME)/.steam/steam/steamapps/common/RimWorld/RimWorldLinux_Data/Managed</RimWorldDir>
+    <RimWorldDir Condition="'$(RimWorldDir)' == '' and Exists('$(HOME)/.local/share/Steam/steamapps/common/RimWorld/RimWorldLinux_Data/Managed/Assembly-CSharp.dll')">$(HOME)/.local/share/Steam/steamapps/common/RimWorld/RimWorldLinux_Data/Managed</RimWorldDir>
+    <RimWorldDir Condition="'$(RimWorldDir)' == '' and Exists('$(HOME)/snap/steam/common/.steam/steam/steamapps/common/RimWorld/RimWorldLinux_Data/Managed/Assembly-CSharp.dll')">$(HOME)/snap/steam/common/.steam/steam/steamapps/common/RimWorld/RimWorldLinux_Data/Managed</RimWorldDir>
+    <!-- Windows – via MSBuild well-known properties + hardcoded drive letters (dotnet on Windows normalizes / and \) -->
+    <RimWorldDir Condition="'$(RimWorldDir)' == '' and Exists('$(ProgramFilesX86)/Steam/steamapps/common/RimWorld/RimWorldWin64_Data/Managed/Assembly-CSharp.dll')">$(ProgramFilesX86)/Steam/steamapps/common/RimWorld/RimWorldWin64_Data/Managed</RimWorldDir>
+    <RimWorldDir Condition="'$(RimWorldDir)' == '' and Exists('$(ProgramFiles)/Steam/steamapps/common/RimWorld/RimWorldWin64_Data/Managed/Assembly-CSharp.dll')">$(ProgramFiles)/Steam/steamapps/common/RimWorld/RimWorldWin64_Data/Managed</RimWorldDir>
+    <RimWorldDir Condition="'$(RimWorldDir)' == '' and Exists('C:/Program Files (x86)/Steam/steamapps/common/RimWorld/RimWorldWin64_Data/Managed/Assembly-CSharp.dll')">C:/Program Files (x86)/Steam/steamapps/common/RimWorld/RimWorldWin64_Data/Managed</RimWorldDir>
+    <RimWorldDir Condition="'$(RimWorldDir)' == '' and Exists('C:/Program Files/Steam/steamapps/common/RimWorld/RimWorldWin64_Data/Managed/Assembly-CSharp.dll')">C:/Program Files/Steam/steamapps/common/RimWorld/RimWorldWin64_Data/Managed</RimWorldDir>
+    <RimWorldDir Condition="'$(RimWorldDir)' == '' and Exists('D:/SteamLibrary/steamapps/common/RimWorld/RimWorldWin64_Data/Managed/Assembly-CSharp.dll')">D:/SteamLibrary/steamapps/common/RimWorld/RimWorldWin64_Data/Managed</RimWorldDir>
+    <!-- Legacy 32-bit managed folder name still used by some installs -->
+    <RimWorldDir Condition="'$(RimWorldDir)' == '' and Exists('C:/Program Files (x86)/Steam/steamapps/common/RimWorld/RimWorldWin_Data/Managed/Assembly-CSharp.dll')">C:/Program Files (x86)/Steam/steamapps/common/RimWorld/RimWorldWin_Data/Managed</RimWorldDir>
+    <!-- Fallback: keep whatever was passed (even if not found) so the error message shows it) -->
+    <RimWorldDir Condition="'$(RimWorldDir)' == '' and '$(RIMWORLD_DIR)' != ''">$(RIMWORLD_DIR)</RimWorldDir>
+  </PropertyGroup>
+  <Target Name="PrintRimWorldDir" BeforeTargets="ResolveAssemblyReferences">
+    <Message Importance="high" Text="EarnedExperience: using RimWorld Managed dir: $(RimWorldDir)" Condition="'$(RimWorldDir)' != ''" />
+    <Warning Text="EarnedExperience: RimWorld not found. Searched default Steam locations and RIMWORLD_DIR='$(RIMWORLD_DIR)'. Set RIMWORLD_DIR to your RimWorld*_Data/Managed folder and rebuild. Example Linux: ~/.steam/steam/steamapps/common/RimWorld/RimWorldLinux_Data/Managed" Condition="'$(RimWorldDir)' == ''" />
+  </Target>
+  <ItemGroup Condition="'$(RimWorldDir)' != ''">
     <Reference Include="Assembly-CSharp">
-      <HintPath>$(RIMWORLD_DIR)/Assembly-CSharp.dll</HintPath>
+      <HintPath>$(RimWorldDir)/Assembly-CSharp.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>$(RIMWORLD_DIR)/UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>$(RimWorldDir)/UnityEngine.CoreModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.IMGUIModule">
-      <HintPath>$(RIMWORLD_DIR)/UnityEngine.IMGUIModule.dll</HintPath>
+      <HintPath>$(RimWorldDir)/UnityEngine.IMGUIModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.TextRenderingModule">
-      <HintPath>$(RIMWORLD_DIR)/UnityEngine.TextRenderingModule.dll</HintPath>
+      <HintPath>$(RimWorldDir)/UnityEngine.TextRenderingModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="0Harmony">
-      <HintPath>$(RIMWORLD_DIR)/0Harmony.dll</HintPath>
+      <HintPath>$(RimWorldDir)/0Harmony.dll</HintPath>
       <Private>false</Private>
     </Reference>
   </ItemGroup>
-  <!-- Fallback stubs when building without RimWorld installed (CI / docs review) -->
-  <ItemGroup Condition="!Exists('$(RIMWORLD_DIR)/Assembly-CSharp.dll')">
-    <!-- No references – compilation will be skipped in CI; files are validated as text -->
+  <!-- No Managed folder found: allow docs/CI to validate files as text without failing -->
+  <ItemGroup Condition="'$(RimWorldDir)' == ''">
+    <!-- intentionally empty -->
   </ItemGroup>
 </Project>

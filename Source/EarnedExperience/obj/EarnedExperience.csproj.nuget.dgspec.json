@@ -1,0 +1,60 @@
+{
+  "format": 1,
+  "restore": {
+    "/home/turka/Desktop/earned-experience/Source/EarnedExperience/EarnedExperience.csproj": {}
+  },
+  "projects": {
+    "/home/turka/Desktop/earned-experience/Source/EarnedExperience/EarnedExperience.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/turka/Desktop/earned-experience/Source/EarnedExperience/EarnedExperience.csproj",
+        "projectName": "EarnedExperience",
+        "projectPath": "/home/turka/Desktop/earned-experience/Source/EarnedExperience/EarnedExperience.csproj",
+        "packagesPath": "/home/turka/.nuget/packages/",
+        "outputPath": "/home/turka/Desktop/earned-experience/Source/EarnedExperience/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/turka/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net472"
+        ],
+        "sources": {
+          "/usr/lib/dotnet/library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net472": {
+            "targetAlias": "net472",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.100"
+      },
+      "frameworks": {
+        "net472": {
+          "targetAlias": "net472",
+          "dependencies": {
+            "Microsoft.NETFramework.ReferenceAssemblies": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.0.3, )",
+              "autoReferenced": true
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/10.0.114/RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
