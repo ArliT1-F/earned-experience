@@ -146,7 +146,7 @@ namespace EarnedExperience.UI
             var skillRect = new Rect(r.x + r.width * 0.60f, r.y + 3f, r.width * 0.40f - 4f, 26f);
             string curSkillName = settings.GetAssignedSkillDefName(type);
             SkillDef curDef = DefDatabase<SkillDef>.GetNamedSilentFail(curSkillName);
-            string btnLabel = curDef != null ? curDef.LabelCap : curSkillName ?? "Crafting";
+            string btnLabel = curDef != null ? (string)curDef.LabelCap : curSkillName ?? "Crafting";
             if (Widgets.ButtonText(skillRect, btnLabel))
             {
                 OpenSkillMenu(type, settings);
