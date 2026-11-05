@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <!-- MapComponent injection is done via MapComponentDef in 1.5+. For 1.6 we also support auto-creation via Harmony patch on Map.ConstructComponents. -->
+</Defs>
