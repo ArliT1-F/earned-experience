@@ -12,81 +12,129 @@ namespace EarnedExperience.Activities
     {
         private static bool initialized;
         private static JobDef doBillDef;
-        private static JobDef cleanFilthDef;
+        private static JobDef doBillLegacyDef;
+        private static JobDef cleanDef;
+        private static JobDef cleanFilthLegacyDef;
         private static JobDef haulToCellDef;
         private static JobDef haulToContainerDef;
         private static JobDef haulToTransporterDef;
+        private static JobDef loadTransporterDef;
         private static JobDef refuelDef;
         private static JobDef refuelAtomicDef;
         private static JobDef rearmTrapDef;
-        private static JobDef doBurnDef;
-        private static JobDef extinguishFireDef;
+        private static JobDef rearmTurretDef;
+        private static JobDef rearmTurretAtomicDef;
+        private static JobDef beatFireDef;
+        private static JobDef extinguishFiresNearbyDef;
+        private static JobDef extinguishSelfDef;
+        private static JobDef extinguishFireLegacyDef;
         private static JobDef feedPatientDef;
-        private static JobDef takeToBedToFeedDef;
-        private static JobDef loadTransporterDef;
 
         public static void EnsureInitialized()
         {
             if (initialized) return;
+            if (DefDatabase<JobDef>.DefCount == 0) return;
             initialized = true;
 
-            // All lookups are SilentFail – missing defs simply mean that activity is not present (e.g., modded version).
-            doBillDef            = DefDatabase<JobDef>.GetNamedSilentFail("Do_Bill");
-            cleanFilthDef        = DefDatabase<JobDef>.GetNamedSilentFail("CleanFilth");
-            haulToCellDef        = DefDatabase<JobDef>.GetNamedSilentFail("HaulToCell");
-            haulToContainerDef   = DefDatabase<JobDef>.GetNamedSilentFail("HaulToContainer");
-            haulToTransporterDef = DefDatabase<JobDef>.GetNamedSilentFail("HaulToTransporter");
-            refuelDef            = DefDatabase<JobDef>.GetNamedSilentFail("Refuel");
-            refuelAtomicDef      = DefDatabase<JobDef>.GetNamedSilentFail("RefuelAtomic"); // added in 1.5 for grav generators etc.
-            rearmTrapDef         = DefDatabase<JobDef>.GetNamedSilentFail("RearmTrap");
-            doBurnDef            = DefDatabase<JobDef>.GetNamedSilentFail("DoBurn"); // unused; cremation uses Do_Bill
-            extinguishFireDef    = DefDatabase<JobDef>.GetNamedSilentFail("ExtinguishSelf");
-            // Firefighting uses multiple defs:
-            // - BeatFire (1.4+)
-            // - ExtinguishFire (older)
-            if (extinguishFireDef == null)
-                extinguishFireDef = DefDatabase<JobDef>.GetNamedSilentFail("BeatFire");
-            if (extinguishFireDef == null)
-                extinguishFireDef = DefDatabase<JobDef>.GetNamedSilentFail("ExtinguishFire");
-
-            feedPatientDef       = DefDatabase<JobDef>.GetNamedSilentFail("FeedPatient");
-            takeToBedToFeedDef   = DefDatabase<JobDef>.GetNamedSilentFail("TakeWoundedPrisonerToBed"); // proxy
-            loadTransporterDef   = DefDatabase<JobDef>.GetNamedSilentFail("LoadTransporter");
+            // All lookups are SilentFail – missing defs simply mean that activity is not present.
+            doBillDef                = DefDatabase<JobDef>.GetNamedSilentFail("DoBill");
+            doBillLegacyDef          = DefDatabase<JobDef>.GetNamedSilentFail("Do_Bill");
+            cleanDef                 = DefDatabase<JobDef>.GetNamedSilentFail("Clean");
+            cleanFilthLegacyDef      = DefDatabase<JobDef>.GetNamedSilentFail("CleanFilth");
+            haulToCellDef            = DefDatabase<JobDef>.GetNamedSilentFail("HaulToCell");
+            haulToContainerDef       = DefDatabase<JobDef>.GetNamedSilentFail("HaulToContainer");
+            haulToTransporterDef     = DefDatabase<JobDef>.GetNamedSilentFail("HaulToTransporter");
+            loadTransporterDef       = DefDatabase<JobDef>.GetNamedSilentFail("LoadTransporter");
+            refuelDef                = DefDatabase<JobDef>.GetNamedSilentFail("Refuel");
+            refuelAtomicDef          = DefDatabase<JobDef>.GetNamedSilentFail("RefuelAtomic");
+            rearmTrapDef             = DefDatabase<JobDef>.GetNamedSilentFail("RearmTrap");
+            rearmTurretDef           = DefDatabase<JobDef>.GetNamedSilentFail("RearmTurret");
+            rearmTurretAtomicDef     = DefDatabase<JobDef>.GetNamedSilentFail("RearmTurretAtomic");
+            beatFireDef              = DefDatabase<JobDef>.GetNamedSilentFail("BeatFire");
+            extinguishFiresNearbyDef = DefDatabase<JobDef>.GetNamedSilentFail("ExtinguishFiresNearby");
+            extinguishSelfDef        = DefDatabase<JobDef>.GetNamedSilentFail("ExtinguishSelf");
+            extinguishFireLegacyDef  = DefDatabase<JobDef>.GetNamedSilentFail("ExtinguishFire");
+            feedPatientDef           = DefDatabase<JobDef>.GetNamedSilentFail("FeedPatient");
         }
 
-        public static bool IsDoBill(Job job) => job != null && job.def == doBillDef;
-        public static bool IsCleanFilth(Job job) => job != null && job.def == cleanFilthDef;
+        public static bool IsDoBill(Job job)
+        {
+            EnsureInitialized();
+            return job != null && job.def != null && (job.def == doBillDef || job.def == doBillLegacyDef);
+        }
+
+        public static bool IsCleanFilth(Job job)
+        {
+            EnsureInitialized();
+            return job != null && job.def != null && (job.def == cleanDef || job.def == cleanFilthLegacyDef);
+        }
+
         public static bool IsHaul(Job job)
         {
-            if (job == null) return false;
-            return job.def == haulToCellDef || job.def == haulToContainerDef || job.def == haulToTransporterDef;
+            EnsureInitialized();
+            if (job == null || job.def == null) return false;
+            return job.def == haulToCellDef || job.def == haulToContainerDef;
         }
-        public static bool IsRefuel(Job job) => job != null && (job.def == refuelDef || job.def == refuelAtomicDef);
-        public static bool IsRearmTrap(Job job) => job != null && job.def == rearmTrapDef;
-        public static bool IsFirefight(Job job) => job != null && job.def == extinguishFireDef;
-        public static bool IsFeedPatient(Job job) => job != null && job.def == feedPatientDef;
-        public static bool IsLoadTransporter(Job job) => job != null && job.def == loadTransporterDef;
+
+        public static bool IsRefuel(Job job)
+        {
+            EnsureInitialized();
+            if (job == null || job.def == null) return false;
+            return job.def == refuelDef || job.def == refuelAtomicDef;
+        }
+
+        public static bool IsRearmTrap(Job job)
+        {
+            EnsureInitialized();
+            if (job == null || job.def == null) return false;
+            return job.def == rearmTrapDef || job.def == rearmTurretDef || job.def == rearmTurretAtomicDef;
+        }
+
+        public static bool IsFirefight(Job job)
+        {
+            EnsureInitialized();
+            if (job == null || job.def == null) return false;
+            return job.def == beatFireDef
+                || job.def == extinguishFiresNearbyDef
+                || job.def == extinguishSelfDef
+                || job.def == extinguishFireLegacyDef;
+        }
+
+        public static bool IsFeedPatient(Job job)
+        {
+            EnsureInitialized();
+            return job != null && job.def != null && job.def == feedPatientDef;
+        }
+
+        public static bool IsLoadTransporter(Job job)
+        {
+            EnsureInitialized();
+            if (job == null || job.def == null) return false;
+            return job.def == haulToTransporterDef || job.def == loadTransporterDef;
+        }
 
         /// <summary>
-        /// For Do_Bill jobs we need to distinguish stonecutting / smelting / cremation by workbench/recipe.
+        /// For DoBill jobs we need to distinguish stonecutting / smelting / cremation by workbench/recipe.
         /// This inspects the bill's recipe and the target building.
         /// </summary>
         public static Core.ActivityType? ClassifyDoBill(Job job)
         {
             if (job == null || job.targetA.Thing == null) return null;
 
-            // Bill is stored on the job via job.bill (Verse.AI.Job.bill) in 1.4+. Check.
             var bill = job.bill;
             if (bill == null) return null;
 
             var recipe = bill.recipe;
             if (recipe == null) return null;
 
+            // Never duplicate XP if a recipe (vanilla or modded) already awards skill XP natively.
+            if (recipe.workSkill != null && recipe.workSkillLearnFactor > 0f)
+                return null;
+
             var bench = job.targetA.Thing;
             var benchDefName = bench.def.defName;
 
             // Stonecutting: recipe on Stonecutter's Table variant.
-            // defNames: TableStonecutter, TableStonecutterElectric (mods)
             if (benchDefName.Contains("Stonecutter"))
             {
                 return Core.ActivityType.Stonecutting;
@@ -95,8 +143,7 @@ namespace EarnedExperience.Activities
             // Smelting: FueledSmelter / ElectricSmelter with recipes like SmeltWeapon, SmeltApparel, etc.
             if (benchDefName.Contains("Smelter"))
             {
-                // Further filter: only smelt recipes, not cremation (which uses Crematorium def)
-                if (recipe.defName.Contains("Smelt") || recipe.defName.StartsWith("Smelt"))
+                if (recipe.defName.Contains("Smelt"))
                     return Core.ActivityType.Smelting;
             }
 
@@ -106,8 +153,8 @@ namespace EarnedExperience.Activities
                 return Core.ActivityType.Cremation;
             }
 
-            // Generic: if recipe is Make_StoneBlocks (fallback) classify as stonecutting anyway.
-            if (recipe.defName == "Make_StoneBlocks" || recipe.defName == "MakeStoneBlocks")
+            // Generic fallback if recipe is Make_StoneBlocks on a modded bench.
+            if (recipe.defName.StartsWith("Make_StoneBlocks") || recipe.defName == "MakeStoneBlocks")
                 return Core.ActivityType.Stonecutting;
 
             return null;
@@ -118,17 +165,14 @@ namespace EarnedExperience.Activities
             EnsureInitialized();
             if (job == null) return null;
 
-            if (IsDoBill(job))
-            {
-                return ClassifyDoBill(job);
-            }
+            if (IsDoBill(job)) return ClassifyDoBill(job);
             if (IsCleanFilth(job)) return Core.ActivityType.Cleaning;
+            if (IsLoadTransporter(job)) return Core.ActivityType.TransportLoading;
             if (IsHaul(job)) return Core.ActivityType.Hauling;
             if (IsRefuel(job)) return Core.ActivityType.Refueling;
             if (IsRearmTrap(job)) return Core.ActivityType.TrapRearming;
             if (IsFirefight(job)) return Core.ActivityType.Firefighting;
             if (IsFeedPatient(job)) return Core.ActivityType.PatientCare;
-            if (IsLoadTransporter(job)) return Core.ActivityType.TransportLoading;
 
             return null;
         }

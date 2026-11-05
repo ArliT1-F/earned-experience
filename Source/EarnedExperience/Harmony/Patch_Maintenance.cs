@@ -1,123 +1,133 @@
+using System.Collections.Generic;
 using System.Reflection;
 using Verse;
 using Verse.AI;
 using RimWorld;
 using HarmonyLib;
 using EarnedExperience.Activities;
-using EarnedExperience.Core;
 
 namespace EarnedExperience.Harmony
 {
-    // Refueling: JobDriver_Refuel
-    [HarmonyPatch]
-    public static class Patch_Refueling
+    internal static class DelayToilPatchHelper
     {
-        static MethodBase TargetMethod()
+        public static IEnumerable<Toil> AttachRefuelOrRearmTicks(IEnumerable<Toil> toils, JobDriver driver)
         {
-            var t = GenTypes.GetTypeInAnyAssembly("RimWorld.JobDriver_Refuel", "Assembly-CSharp");
-            if (t == null) return null;
-            var m = t.GetMethod("RefuelWorkTick", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            if (m != null) return m;
-            m = t.GetMethod("DoRefuelWork", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            return m;
-        }
-
-        static void Postfix(Pawn ___pawn, Job ___job)
-        {
-            try
+            if (toils == null) yield break;
+            foreach (var toil in toils)
             {
-                if (___pawn == null || ___job == null) return;
-                RefuelingHandler.OnWorkTick(___pawn, ___job, 1);
+                if (toil != null && toil.defaultCompleteMode == ToilCompleteMode.Delay)
+                {
+                    toil.AddPreTickAction(() =>
+                    {
+                        try
+                        {
+                            var pawn = driver?.pawn;
+                            var job = driver?.job;
+                            if (pawn == null || job == null) return;
+                            if (ActivityUtility.IsRearmTrap(job))
+                                TrapRearmingHandler.OnWorkTick(pawn, job, 1);
+                            else if (ActivityUtility.IsRefuel(job))
+                                RefuelingHandler.OnWorkTick(pawn, job, 1);
+                        }
+                        catch { }
+                    });
+                }
+                yield return toil;
             }
-            catch { }
         }
     }
 
-    // Trap rearming: JobDriver_RearmTrap
+    // Refueling & turret rearming: JobDriver_Refuel.MakeNewToils
+    [HarmonyPatch(typeof(JobDriver_Refuel), "MakeNewToils")]
+    public static class Patch_Refueling
+    {
+        static IEnumerable<Toil> Postfix(IEnumerable<Toil> values, JobDriver __instance)
+        {
+            return DelayToilPatchHelper.AttachRefuelOrRearmTicks(values, __instance);
+        }
+    }
+
+    // Atomic refueling & turret rearming: JobDriver_RefuelAtomic.MakeNewToils
+    [HarmonyPatch(typeof(JobDriver_RefuelAtomic), "MakeNewToils")]
+    public static class Patch_RefuelingAtomic
+    {
+        static IEnumerable<Toil> Postfix(IEnumerable<Toil> values, JobDriver __instance)
+        {
+            return DelayToilPatchHelper.AttachRefuelOrRearmTicks(values, __instance);
+        }
+    }
+
+    // Modded trap rearming: JobDriver_RearmTrap (optional – skipped cleanly when absent)
     [HarmonyPatch]
     public static class Patch_TrapRearm
     {
+        static bool Prepare() => TargetMethod() != null;
+
         static MethodBase TargetMethod()
         {
-            var t = GenTypes.GetTypeInAnyAssembly("RimWorld.JobDriver_RearmTrap", "Assembly-CSharp");
-            if (t == null) return null;
-            var m = t.GetMethod("RearmWorkTick", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            if (m != null) return m;
-            m = t.GetMethod("DoRearmWork", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            return m;
+            var t = GenTypes.GetTypeInAnyAssembly("RimWorld.JobDriver_RearmTrap")
+                 ?? GenTypes.GetTypeInAnyAssembly("JobDriver_RearmTrap");
+            return t?.GetMethod("MakeNewToils", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
         }
 
-        static void Postfix(Pawn ___pawn, Job ___job)
+        static IEnumerable<Toil> Postfix(IEnumerable<Toil> values, JobDriver __instance)
         {
-            try
+            if (values == null) yield break;
+            foreach (var toil in values)
             {
-                if (___pawn == null || ___job == null) return;
-                TrapRearmingHandler.OnWorkTick(___pawn, ___job, 1);
+                if (toil != null && toil.defaultCompleteMode == ToilCompleteMode.Delay)
+                {
+                    toil.AddPreTickAction(() =>
+                    {
+                        try
+                        {
+                            if (__instance?.pawn == null || __instance.job == null) return;
+                            TrapRearmingHandler.OnWorkTick(__instance.pawn, __instance.job, 1);
+                        }
+                        catch { }
+                    });
+                }
+                yield return toil;
             }
-            catch { }
         }
     }
 
-    // Firefighting: JobDriver_BeatFire / FightFires
-    [HarmonyPatch]
+    // Firefighting: Pawn_NativeVerbs.TryBeatFire initiates a ~30-tick fire-beating stance on success
+    [HarmonyPatch(typeof(Pawn_NativeVerbs), nameof(Pawn_NativeVerbs.TryBeatFire))]
     public static class Patch_Firefighting
     {
-        static MethodBase TargetMethod()
-        {
-            var t = GenTypes.GetTypeInAnyAssembly("RimWorld.JobDriver_BeatFire", "Assembly-CSharp");
-            if (t == null) t = GenTypes.GetTypeInAnyAssembly("RimWorld.JobDriver_FightFires", "Assembly-CSharp");
-            if (t == null) t = GenTypes.GetTypeInAnyAssembly("JobDriver_BeatFire", "Assembly-CSharp");
-            if (t == null) return null;
-            var m = t.GetMethod("BeatFireTick", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            if (m != null) return m;
-            m = t.GetMethod("DoWorkTick", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            return m;
-        }
-
-        static void Postfix(Pawn ___pawn, Job ___job)
+        static void Postfix(Pawn ___pawn, bool __result)
         {
             try
             {
-                if (___pawn == null || ___job == null) return;
-                FirefightingHandler.OnWorkTick(___pawn, ___job, 1);
+                if (!__result || ___pawn == null) return;
+                var job = ___pawn.CurJob;
+                if (job == null) return;
+                FirefightingHandler.OnWorkTick(___pawn, job, 30);
             }
             catch { }
         }
     }
 
-    // Fallback for firefighting via Fire.BeatFire tick on the Fire thing itself
-    [HarmonyPatch(typeof(Fire), "DoComplexCalcs")]
-    public static class Patch_Fire_DoComplexCalcs
-    {
-        // Fire.Tick fires DoComplexCalcs every ~150 ticks – not ideal, so we also patch Tick.
-        static void Postfix(Fire __instance)
-        {
-            // Not used: we rely on driver tick above; this patch is a fallback for older versions where driver was missing.
-        }
-    }
-
-    // Patient care: JobDriver_FeedPatient
-    [HarmonyPatch]
+    // Patient care: Toils_Ingest.ChewIngestible when feeder != patient (JobDriver_FoodFeedPatient)
+    [HarmonyPatch(typeof(Toils_Ingest), nameof(Toils_Ingest.ChewIngestible))]
     public static class Patch_FeedPatient
     {
-        static MethodBase TargetMethod()
+        static void Postfix(Pawn chewer, Toil __result)
         {
-            var t = GenTypes.GetTypeInAnyAssembly("RimWorld.JobDriver_FeedPatient", "Assembly-CSharp");
-            if (t == null) return null;
-            var m = t.GetMethod("FeedPatientTick", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            if (m != null) return m;
-            m = t.GetMethod("DoFeedTick", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            return m;
-        }
-
-        static void Postfix(Pawn ___pawn, Job ___job)
-        {
-            try
+            if (__result == null) return;
+            __result.AddPreTickAction(() =>
             {
-                if (___pawn == null || ___job == null) return;
-                PatientCareHandler.OnWorkTick(___pawn, ___job, 1);
-            }
-            catch { }
+                try
+                {
+                    var actor = __result.actor;
+                    if (actor == null || actor == chewer) return;
+                    var job = actor.CurJob;
+                    if (job == null || !ActivityUtility.IsFeedPatient(job)) return;
+                    PatientCareHandler.OnWorkTick(actor, job, 1);
+                }
+                catch { }
+            });
         }
     }
 }

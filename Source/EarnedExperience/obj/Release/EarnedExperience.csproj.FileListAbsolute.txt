@@ -1,4 +1,0 @@
-/home/turka/Desktop/earned-experience/Source/EarnedExperience/obj/Release/EarnedExperience.csproj.AssemblyReference.cache
-/home/turka/Desktop/earned-experience/Source/EarnedExperience/obj/Release/EarnedExperience.GeneratedMSBuildEditorConfig.editorconfig
-/home/turka/Desktop/earned-experience/Source/EarnedExperience/obj/Release/EarnedExperience.csproj.CoreCompileInputs.cache
-/home/turka/Desktop/earned-experience/Source/EarnedExperience/obj/Release/EarnedExperience.sourcelink.json

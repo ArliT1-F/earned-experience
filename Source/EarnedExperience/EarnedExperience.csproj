@@ -38,6 +38,9 @@
     <Message Importance="high" Text="EarnedExperience: using RimWorld Managed dir: $(RimWorldDir)" Condition="'$(RimWorldDir)' != ''" />
     <Warning Text="EarnedExperience: RimWorld not found. Searched default Steam locations and RIMWORLD_DIR='$(RIMWORLD_DIR)'. Set RIMWORLD_DIR to your RimWorld*_Data/Managed folder and rebuild. Example Linux: ~/.steam/steam/steamapps/common/RimWorld/RimWorldLinux_Data/Managed" Condition="'$(RimWorldDir)' == ''" />
   </Target>
+  <ItemGroup>
+    <PackageReference Include="Lib.Harmony" Version="2.4.2" ExcludeAssets="runtime" PrivateAssets="all" />
+  </ItemGroup>
   <ItemGroup Condition="'$(RimWorldDir)' != ''">
     <Reference Include="Assembly-CSharp">
       <HintPath>$(RimWorldDir)/Assembly-CSharp.dll</HintPath>
@@ -53,10 +56,6 @@
     </Reference>
     <Reference Include="UnityEngine.TextRenderingModule">
       <HintPath>$(RimWorldDir)/UnityEngine.TextRenderingModule.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="0Harmony">
-      <HintPath>$(RimWorldDir)/0Harmony.dll</HintPath>
       <Private>false</Private>
     </Reference>
   </ItemGroup>
