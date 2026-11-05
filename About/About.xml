@@ -11,10 +11,8 @@
         Supported activities: stonecutting, smelting (weapons/apparel), cleaning, hauling, transport loading, refueling, trap rearming, cremation, firefighting, patient care (feeding).
         See included Technical Report for verification of vanilla XP gaps.
     </description>
-    <descriptionShort>Award skill XP for useful work that vanilla overlooks — stonecutting, hauling, cleaning and more.</descriptionShort>
-    <authorCount>1</authorCount>
     <modVersion>1.0</modVersion>
-      <modDependencies>
+    <modDependencies>
     </modDependencies>
     <loadAfter>
         <li>brrainz.harmony</li>

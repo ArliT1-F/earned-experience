@@ -1,3 +1,5 @@
+using Verse;
+
 namespace EarnedExperience.Core
 {
     public class MapComponent_EarnedExperience : MapComponent

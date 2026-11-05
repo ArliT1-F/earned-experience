@@ -1,6 +1,5 @@
 using Verse;
 using Verse.AI;
-using RimWorld;
 using HarmonyLib;
 using EarnedExperience.Activities;
 
@@ -8,9 +7,9 @@ namespace EarnedExperience.Harmony
 {
     /// <summary>
     /// Hauling: capture start position at job start and award on completion via lifecycle hook.
-    /// Additional per-haul placement hook for HaulToCell is kept as early signal.
+    /// Additional placement hook on Toils_Haul.PlaceHauledThingInCell handles multi-item hauls cleanly.
     /// </summary>
-    [HarmonyPatch(typeof(Pawn_JobTracker), "StartJob")]
+    [HarmonyPatch(typeof(Pawn_JobTracker), nameof(Pawn_JobTracker.StartJob))]
     public static class Patch_Hauling_Start
     {
         static void Postfix(Pawn ___pawn, Job newJob)
@@ -25,22 +24,26 @@ namespace EarnedExperience.Harmony
         }
     }
 
-    [HarmonyPatch(typeof(Toils_Haul), "PlaceHauledThingInCell")]
+    [HarmonyPatch(typeof(Toils_Haul), nameof(Toils_Haul.PlaceHauledThingInCell))]
     public static class Patch_Hauling_PlaceInCell
     {
-        static void Postfix(Pawn pawn, IntVec3 cell, Thing thing)
+        static void Postfix(Toil __result)
         {
-            try
+            if (__result == null) return;
+            __result.AddFinishAction(() =>
             {
-                if (pawn == null) return;
-                var job = pawn.CurJob;
-                if (job == null || !ActivityUtility.IsHaul(job)) return;
-                var start = HaulingState.PeekStart(pawn, job);
-                if (start == IntVec3.Invalid) return; // already handled or not tracked
-                // Don't clear here – let EndCurrentJob clear to avoid race; duplicate guard in tracker prevents double.
-                HaulingHandler.OnHaulCompleted(pawn, job, thing, start);
-            }
-            catch { }
+                try
+                {
+                    var pawn = __result.actor;
+                    var job = pawn?.CurJob;
+                    if (pawn == null || job == null || !ActivityUtility.IsHaul(job)) return;
+                    var start = HaulingState.PeekStart(pawn, job);
+                    if (start == IntVec3.Invalid) return;
+                    // Don't clear here – let EndCurrentJob clear to avoid race; duplicate guard in tracker prevents double.
+                    HaulingHandler.OnHaulCompleted(pawn, job, job.targetA.Thing, start);
+                }
+                catch { }
+            });
         }
     }
 

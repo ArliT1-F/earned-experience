@@ -1,0 +1,16 @@
+# Build intermediates
+[Bb]in/
+[Oo]bj/
+
+# Debug symbols
+Assemblies/*.pdb
+
+# IDE and OS files
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+*.DotSettings.user
+.DS_Store
+Thumbs.db

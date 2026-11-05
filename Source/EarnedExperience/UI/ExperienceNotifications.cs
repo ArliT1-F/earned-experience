@@ -20,9 +20,8 @@ namespace EarnedExperience.UI
                 // Aggregate message – show skill icon + XP once per batch, not per tick.
                 string text = $"+{amount:F1} {skill.LabelCap}";
 
-                // Use MoteMaker.ThrowText if available; fallback to Messages.
-                // MoteMaker.ThrowText signature: ThrowText(Vector3 loc, Map map, string text, Color color, float timeBeforeStart = 0)
-                if (MoteMaker.CanThrowText(pawn.DrawPos))
+                // MoteMaker.ThrowText signature: ThrowText(Vector3 loc, Map map, string text, Color color, float timeBeforeStartFadeout = -1f)
+                if (pawn.Position.InBounds(pawn.Map))
                 {
                     // Use skill-tinted color – light blue for intellectual, orange for crafting, etc.
                     Color color = Color.white;

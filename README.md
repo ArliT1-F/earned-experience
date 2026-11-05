@@ -73,7 +73,7 @@ dotnet build Source/EarnedExperience/EarnedExperience.csproj -c Release
 # Or use your IDE (Rider / Visual Studio)
 ```
 
-The `.csproj` expects `Assembly-CSharp.dll`, `UnityEngine.*.dll`, and `0Harmony.dll` in `$(RIMWORLD_DIR)`. They are not bundled. A build without RimWorld installed is useful for review but does not produce a runnable DLL.
+The `.csproj` expects `Assembly-CSharp.dll` and `UnityEngine.*.dll` in `$(RIMWORLD_DIR)`, and restores `Lib.Harmony` automatically from NuGet at compile time (excluded from runtime output so it does not conflict with the Harmony mod). Game assemblies are not bundled.
 
 ---
 

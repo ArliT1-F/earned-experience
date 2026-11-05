@@ -61,9 +61,8 @@ namespace EarnedExperience.Core
             // direct = false so that implants/genes/etc. apply. We also ensure xp > 0.
             try
             {
-                float xpBefore = skillRecord.xpSinceLastLevel;
-                // SkillRecord.Learn signature in 1.4/1.5: Learn(float xp, bool direct = false)
-                // In 1.6 it remains the same. We pass direct:false to respect vanilla modifiers.
+                // SkillRecord.Learn signature in 1.4/1.5/1.6: Learn(float xp, bool direct = false, bool ignoreLearnRate = false)
+                // We pass direct:false to respect vanilla modifiers.
                 skillRecord.Learn(finalXp, false);
 
                 if (Settings != null && Settings.enableDebugLogging)

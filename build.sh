@@ -43,7 +43,7 @@ fi
 
 if [[ ! -f "$RIMWORLD_DIR/Assembly-CSharp.dll" ]]; then
   echo "Assembly-CSharp.dll not found in RIMWORLD_DIR=$RIMWORLD_DIR"
-  echo "Check the path points to the Managed folder (must contain Assembly-CSharp.dll, UnityEngine.*.dll, 0Harmony.dll)"
+  echo "Check the path points to the Managed folder (must contain Assembly-CSharp.dll and UnityEngine.*.dll)"
   exit 1
 fi
 

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using RimWorld;
 using UnityEngine;
 using Verse;
 using EarnedExperience.Core;
@@ -19,8 +20,13 @@ namespace EarnedExperience.UI
         {
             if (settings == null) return;
 
+            var activities = System.Enum.GetValues(typeof(ActivityType));
+            float contentHeight = 310f + activities.Length * (RowHeight + 2f) + 60f;
+            var viewRect = new Rect(0f, 0f, inRect.width - 16f, contentHeight);
+
+            Widgets.BeginScrollView(inRect, ref scrollPos, viewRect);
             var listing = new Listing_Standard();
-            listing.Begin(inRect);
+            listing.Begin(viewRect);
 
             // Global
             Text.Font = GameFont.Medium;
@@ -35,7 +41,7 @@ namespace EarnedExperience.UI
             settings.globalMultiplier = Widgets.HorizontalSlider(listing.GetRect(22f), settings.globalMultiplier, 0f, 3f, true,
                 null, "0x", "3x", 0.05f);
             listing.Gap(2f);
-            listing.Label("EarnedExperience_GlobalMult_Desc".Translate(), -1, "EarnedExperience_GlobalMult_Desc".Translate());
+            listing.Label("EarnedExperience_GlobalMult_Desc".Translate());
             listing.Gap(6f);
 
             listing.CheckboxLabeled("EarnedExperience_Notifications_Label".Translate(), ref settings.enableNotifications,
@@ -67,7 +73,7 @@ namespace EarnedExperience.UI
             listing.Gap(2f);
 
             // Rows
-            foreach (ActivityType type in System.Enum.GetValues(typeof(ActivityType)))
+            foreach (ActivityType type in activities)
             {
                 var rowRect = listing.GetRect(RowHeight);
                 DrawActivityRow(rowRect, type, settings);
@@ -75,8 +81,9 @@ namespace EarnedExperience.UI
             }
 
             listing.Gap(6f);
-            listing.Label("EarnedExperience_Footer_Hint".Translate(), -1);
+            listing.Label("EarnedExperience_Footer_Hint".Translate());
             listing.End();
+            Widgets.EndScrollView();
         }
 
         private static void DrawHeader(Rect r)
@@ -118,15 +125,18 @@ namespace EarnedExperience.UI
 
             // Multiplier slider compact
             var multRect = new Rect(r.x + r.width * 0.42f, r.y + 4f, r.width * 0.18f - 8f, 24f);
-            float mult = settings.GetMultiplier(type);
+            float oldMult = settings.GetMultiplier(type);
+            float mult = oldMult;
             // Small +/- buttons + slider
             if (Widgets.ButtonText(new Rect(multRect.x, multRect.y, 18f, 24f), "-"))
                 mult = Mathf.Clamp(mult - 0.1f, 0f, 10f);
             if (Widgets.ButtonText(new Rect(multRect.x + multRect.width - 18f, multRect.y, 18f, 24f), "+"))
                 mult = Mathf.Clamp(mult + 0.1f, 0f, 10f);
             var sliderRect = new Rect(multRect.x + 20f, multRect.y + 4f, multRect.width - 40f, 16f);
-            float newMult = Widgets.HorizontalSlider(sliderRect, mult, 0f, 3f, true, null, null, null, 0.05f);
-            if (!Mathf.Approximately(newMult, mult))
+            float newMult = Widgets.HorizontalSlider(sliderRect, Mathf.Clamp(mult, 0f, 3f), 0f, 3f, true, null, null, null, 0.05f);
+            if (!Mathf.Approximately(mult, oldMult))
+                newMult = mult;
+            if (!Mathf.Approximately(newMult, oldMult))
                 settings.SetMultiplier(type, newMult);
 
             // Tooltip for multiplier numeric

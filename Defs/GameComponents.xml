@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Defs>
-  <GameComponentDef>
-    <defName>EarnedExperience_GameComponent</defName>
-    <gameComponentClass>EarnedExperience.Core.GameComponent_EarnedExperience</gameComponentClass>
-  </GameComponentDef>
+  <!-- GameComponent_EarnedExperience is discovered and instantiated automatically by Verse.Game.FillComponents(). -->
 </Defs>
