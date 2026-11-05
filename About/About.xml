@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+    <name>Earned Experience</name>
+    <author>ArliT1-F</author>
+    <packageId>arli.earnedexperience</packageId>
+    <supportedVersions>
+        <li>1.6</li>
+        <li>1.7</li>
+    </supportedVersions>
+    <description>Expands vanilla skill progression by awarding XP for meaningful work that normally gives no experience — stonecutting, smelting, cleaning, hauling, refueling, trap rearming, cremation, firefighting and patient care. XP is proportional to actual work performed, respects passions and learning limits, and is fully configurable per-activity. Feels like vanilla.
+        Supported activities: stonecutting, smelting (weapons/apparel), cleaning, hauling, transport loading, refueling, trap rearming, cremation, firefighting, patient care (feeding).
+        See included Technical Report for verification of vanilla XP gaps.
+    </description>
+    <descriptionShort>Award skill XP for useful work that vanilla overlooks — stonecutting, hauling, cleaning and more.</descriptionShort>
+    <authorCount>1</authorCount>
+    <modVersion>1.0</modVersion>
+      <modDependencies>
+    </modDependencies>
+    <loadAfter>
+        <li>brrainz.harmony</li>
+    </loadAfter>
+    <incompatibleWith>
+    </incompatibleWith>
+</ModMetaData>
